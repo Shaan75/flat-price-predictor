@@ -99,10 +99,11 @@ if st.sidebar.button("🔍 Predict & Explain"):
     st.markdown("## 🤖 Why this price? (Explainable AI)")
     explainer = shap.TreeExplainer(model)
     shap_values = explainer.shap_values([input_data])
-    shap.initjs()
-    st.write("### SHAP Force Plot (Feature Impact)")
-    st_shap = shap.force_plot(explainer.expected_value, shap_values[0], feature_names, matplotlib=True)
-    st.pyplot(st_shap)
+    st.write("### SHAP Summary Plot (Feature Impact)")
+    fig, ax = plt.subplots()
+    shap.summary_plot(shap_values, [input_data], feature_names=feature_names, plot_type="bar", show=False)
+    st.pyplot(fig)
+
 
 
 # ---- ANALYTICS DASHBOARD ----
