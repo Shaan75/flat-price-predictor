@@ -8,22 +8,35 @@ import shap
 # ---- PAGE CONFIG ----
 st.set_page_config(page_title="Flat Price Predictor", page_icon="🏠", layout="wide")
 
-# ---- CUSTOM CSS FOR MODERN DARK THEME ----
+# ---- CUSTOM CSS FOR DARK THEME + SEXY BUTTON ----
 st.markdown("""
     <style>
         body {background-color: #121212; color: #FFFFFF;}
-        .stButton>button {
-            background-color: #FF5733;
-            color: white;
-            border-radius: 8px;
-            font-size: 18px;
-            padding: 10px;
-        }
-        .css-1d391kg, .stSidebar {
+        h1, h2, h3, h4 {color: #FF5733;}
+        .stSidebar {
             background-color: #1E1E1E;
         }
-        h1, h2, h3 {
-            color: #FF5733;
+        /* Sexy Predict Button */
+        .stButton>button {
+            background: linear-gradient(135deg, #ff4b2b, #ff416c);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.4s ease-in-out;
+            box-shadow: 0 4px 10px rgba(255, 65, 108, 0.4);
+        }
+        .stButton>button:hover {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            transform: scale(1.08);
+            box-shadow: 0 6px 18px rgba(255, 65, 108, 0.6);
+        }
+        .stButton>button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 6px rgba(255, 65, 108, 0.4);
         }
     </style>
 """, unsafe_allow_html=True)
@@ -33,7 +46,6 @@ model = pickle.load(open("flat_price_model.pkl", "rb"))
 feature_names = model.feature_names_in_
 locations = [f for f in feature_names if f not in ['total_sqft', 'bath', 'bhk']]
 
-# Use cache with TTL=0 to avoid stale data
 @st.cache_data(ttl=0)
 def load_data():
     return pd.read_csv("cleaned_bangalore_data.csv")
@@ -53,7 +65,7 @@ bhk = st.sidebar.selectbox("🛏️ Bedrooms (BHK)", [1, 2, 3, 4, 5])
 bath = st.sidebar.selectbox("🚿 Bathrooms", [1, 2, 3, 4])
 budget = st.sidebar.number_input("💰 Your Budget (₹ Lakhs)", 10, 1000, step=5)
 
-if st.sidebar.button("🔍 Predict & Explain"):
+if st.sidebar.button("🔥 Predict & Explain"):
     # ---- INPUT VECTOR ----
     input_data = np.zeros(len(feature_names))
     input_data[0] = sqft
@@ -99,12 +111,11 @@ if st.sidebar.button("🔍 Predict & Explain"):
     st.markdown("## 🤖 Why this price? (Explainable AI)")
     explainer = shap.TreeExplainer(model)
     shap_values = explainer.shap_values([input_data])
-    st.write("### SHAP Summary Plot (Feature Impact)")
+
+    # Use a static bar plot for Streamlit
     fig, ax = plt.subplots()
     shap.summary_plot(shap_values, [input_data], feature_names=feature_names, plot_type="bar", show=False)
     st.pyplot(fig)
-
-
 
 # ---- ANALYTICS DASHBOARD ----
 st.markdown("---")
