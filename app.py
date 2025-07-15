@@ -8,30 +8,41 @@ import shap
 # ---- PAGE CONFIG ----
 st.set_page_config(page_title="Flat Price Predictor", page_icon="🏠", layout="wide")
 
-# ---- CUSTOM CSS FOR DARK MODE LOOK ----
+# ---- CUSTOM CSS FOR MODERN DARK THEME ----
 st.markdown("""
     <style>
         body {background-color: #121212; color: #FFFFFF;}
-        .stButton>button {background-color: #FF5733; color: white; border-radius: 8px;}
-        .css-1d391kg {background-color: #1E1E1E;}
+        .stButton>button {
+            background-color: #FF5733;
+            color: white;
+            border-radius: 8px;
+            font-size: 18px;
+            padding: 10px;
+        }
+        .css-1d391kg, .stSidebar {
+            background-color: #1E1E1E;
+        }
+        h1, h2, h3 {
+            color: #FF5733;
+        }
     </style>
 """, unsafe_allow_html=True)
 
 # ---- LOAD MODEL & DATA ----
 model = pickle.load(open("flat_price_model.pkl", "rb"))
-
 feature_names = model.feature_names_in_
 locations = [f for f in feature_names if f not in ['total_sqft', 'bath', 'bhk']]
 
-@st.cache_data
+# Use cache with TTL=0 to avoid stale data
+@st.cache_data(ttl=0)
 def load_data():
     return pd.read_csv("cleaned_bangalore_data.csv")
 
 df = load_data()
 
 # ---- TITLE ----
-st.markdown("<h1 style='text-align:center;'>🏠 Flat Price Predictor with Explainable AI</h1>", unsafe_allow_html=True)
-st.markdown("<h4 style='text-align:center;'>Predict • Compare • Analyze • Understand</h4>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:center;'>🏠 Flat Price Predictor</h1>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align:center;'>Predict • Compare • Analyze • Explain</h4>", unsafe_allow_html=True)
 st.markdown("---")
 
 # ---- SIDEBAR INPUT ----
